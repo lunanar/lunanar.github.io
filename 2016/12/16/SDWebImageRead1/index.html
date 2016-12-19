@@ -8,16 +8,16 @@
   <link rel="dns-prefetch" href="http://lunanar.github.io">
   <title>SDWebImage源码阅读（一） | Lunar的iOS之路</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="&amp;emsp;&amp;emsp;本文开始将对SDWbeImage这个开源库进行源码阅读，边读会边记录，若有不当之处欢迎大家来信与我讨论(邮箱：&amp;#x6c;&amp;#117;&amp;#110;&amp;#x61;&amp;#114;&amp;#109;&amp;#x61;&amp;#x6f;&amp;#64;&amp;#49;&amp;#x36;&amp;#x33;&amp;#x2e;&amp;#99;&amp;#x6f;&amp;#x6d;)。&amp;emsp;&amp;emsp;我们在使用SDWebImage时用的最多的是这样：">
+  <meta name="description" content="Overview&amp;emsp;&amp;emsp;本文开始将对SDWbeImage这个开源库进行源码阅读，边读会边记录，若有不当之处欢迎大家来信与我讨论(邮箱：&amp;#108;&amp;#117;&amp;#x6e;&amp;#x61;&amp;#114;&amp;#109;&amp;#97;&amp;#111;&amp;#x40;&amp;#x31;&amp;#x36;&amp;#x33;&amp;#46;&amp;#x63;&amp;#111;&amp;#109;)。 这个第一节主要是对UIImageView+WebCach">
 <meta property="og:type" content="article">
 <meta property="og:title" content="SDWebImage源码阅读（一）">
-<meta property="og:url" content="http://lunanar.github.io/2016/12/16/SDWebImageRead/index.html">
+<meta property="og:url" content="http://lunanar.github.io/2016/12/16/SDWebImageRead1/index.html">
 <meta property="og:site_name" content="Lunar的iOS之路">
-<meta property="og:description" content="&amp;emsp;&amp;emsp;本文开始将对SDWbeImage这个开源库进行源码阅读，边读会边记录，若有不当之处欢迎大家来信与我讨论(邮箱：&amp;#x6c;&amp;#117;&amp;#110;&amp;#x61;&amp;#114;&amp;#109;&amp;#x61;&amp;#x6f;&amp;#64;&amp;#49;&amp;#x36;&amp;#x33;&amp;#x2e;&amp;#99;&amp;#x6f;&amp;#x6d;)。&amp;emsp;&amp;emsp;我们在使用SDWebImage时用的最多的是这样：">
-<meta property="og:updated_time" content="2016-12-19T03:10:57.000Z">
+<meta property="og:description" content="Overview&amp;emsp;&amp;emsp;本文开始将对SDWbeImage这个开源库进行源码阅读，边读会边记录，若有不当之处欢迎大家来信与我讨论(邮箱：&amp;#108;&amp;#117;&amp;#x6e;&amp;#x61;&amp;#114;&amp;#109;&amp;#97;&amp;#111;&amp;#x40;&amp;#x31;&amp;#x36;&amp;#x33;&amp;#46;&amp;#x63;&amp;#111;&amp;#109;)。 这个第一节主要是对UIImageView+WebCach">
+<meta property="og:updated_time" content="2016-12-19T03:32:26.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="SDWebImage源码阅读（一）">
-<meta name="twitter:description" content="&amp;emsp;&amp;emsp;本文开始将对SDWbeImage这个开源库进行源码阅读，边读会边记录，若有不当之处欢迎大家来信与我讨论(邮箱：&amp;#x6c;&amp;#117;&amp;#110;&amp;#x61;&amp;#114;&amp;#109;&amp;#x61;&amp;#x6f;&amp;#64;&amp;#49;&amp;#x36;&amp;#x33;&amp;#x2e;&amp;#99;&amp;#x6f;&amp;#x6d;)。&amp;emsp;&amp;emsp;我们在使用SDWebImage时用的最多的是这样：">
+<meta name="twitter:description" content="Overview&amp;emsp;&amp;emsp;本文开始将对SDWbeImage这个开源库进行源码阅读，边读会边记录，若有不当之处欢迎大家来信与我讨论(邮箱：&amp;#108;&amp;#117;&amp;#x6e;&amp;#x61;&amp;#114;&amp;#109;&amp;#97;&amp;#111;&amp;#x40;&amp;#x31;&amp;#x36;&amp;#x33;&amp;#46;&amp;#x63;&amp;#111;&amp;#109;)。 这个第一节主要是对UIImageView+WebCach">
   
     <link rel="alternative" href="/atom.xml" title="Lunar的iOS之路" type="application/atom+xml">
   
@@ -141,7 +141,7 @@
 </nav>
 
       <div class="body-wrap">
-        <article id="post-SDWebImageRead" class="article article-type-post" itemscope itemprop="blogPost">
+        <article id="post-SDWebImageRead1" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <input type="hidden" class="isFancy" />
@@ -159,42 +159,47 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>&emsp;&emsp;本文开始将对SDWbeImage这个开源库进行源码阅读，边读会边记录，若有不当之处欢迎大家来信与我讨论(邮箱：<a href="&#109;&#x61;&#x69;&#108;&#x74;&#111;&#x3a;&#x6c;&#117;&#110;&#x61;&#114;&#109;&#x61;&#x6f;&#64;&#49;&#x36;&#x33;&#x2e;&#99;&#x6f;&#x6d;">&#x6c;&#117;&#110;&#x61;&#114;&#109;&#x61;&#x6f;&#64;&#49;&#x36;&#x33;&#x2e;&#99;&#x6f;&#x6d;</a>)。<br>&emsp;&emsp;我们在使用SDWebImage时用的最多的是这样：</p>
-<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[cell.imgView sd_setImageWithURL:imgUrl placeholderImage:[<span class="built_in">UIImage</span> imageNamed:<span class="string">@"placeholder"</span>]];</div></pre></td></tr></table></figure>
+        <h2 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h2><p>&emsp;&emsp;本文开始将对SDWbeImage这个开源库进行源码阅读，边读会边记录，若有不当之处欢迎大家来信与我讨论(邮箱：<a href="&#x6d;&#x61;&#105;&#108;&#116;&#x6f;&#x3a;&#108;&#117;&#x6e;&#x61;&#114;&#109;&#97;&#111;&#x40;&#x31;&#x36;&#x33;&#46;&#x63;&#111;&#109;">&#108;&#117;&#x6e;&#x61;&#114;&#109;&#97;&#111;&#x40;&#x31;&#x36;&#x33;&#46;&#x63;&#111;&#109;</a>)。 这个第一节主要是对UIImageView+WebCache这个类核心函数的解析。<br>&emsp;&emsp;我们在使用SDWebImage时用的最多的是这样：<br><figure class="highlight objectivec"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[cell.imgView sd_setImageWithURL:imgUrl placeholderImage:[<span class="built_in">UIImage</span> imageNamed:<span class="string">@"placeholder"</span>]];</div></pre></td></tr></table></figure></p>
 <p>&emsp;&emsp;可以看到这个函数是在UIImageView+WebCache这个类中，最核心的是这个函数：</p>
 <figure class="highlight objectivec"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">- (<span class="keyword">void</span>)sd_setImageWithURL:(<span class="built_in">NSURL</span> *)url placeholderImage:(<span class="built_in">UIImage</span> *)placeholder options:(SDWebImageOptions)options progress:(SDWebImageDownloaderProgressBlock)progressBlock completed:(SDWebImageCompletionBlock)completedBlock &#123;</div></pre></td></tr></table></figure>
-<p>&emsp;&emsp;那么我们一行行看下去这个函数究竟干了什么以及它和其它类之间是什么关系。<br>&emsp;&emsp;首先，是这一行代码：</p>
+<p>&emsp;&emsp;那么我们一行行看下去这个函数究竟干了什么以及它和其它类之间是什么关系。</p>
+<p>&emsp;&emsp;首先，是这一行代码：</p>
 <figure class="highlight objectivec"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[<span class="keyword">self</span> sd_cancelCurrentImageLoad];</div></pre></td></tr></table></figure>
-<p>这行代码乍看没什么，其实考虑到了很多东西。一言以蔽之，它的出现是为了保住当前正在进行的异步下载操作与即将进行的操作不会冲突。可能不大好理解，大概是，SDWebImage将所有的operation都添加到了operationDictionary这个字典中，每类operation对应一个key，究竟有多少类operation我们会在接下去的分析中看到，而这行cancel是为了取消operationDictionary里面key为UIImageViewImageLoad的操作，那么为什么要取消呢？来看一个简单的例子：</p>
+<p>&emsp;&emsp;这行代码乍看没什么，其实考虑到了很多东西。一言以蔽之，它的出现是为了保住当前正在进行的异步下载操作与即将进行的操作不会冲突。可能不大好理解，大概是，SDWebImage将所有的operation都添加到了operationDictionary这个字典中，每类operation对应一个key，究竟有多少类operation我们会在接下去的分析中看到，而这行cancel是为了取消operationDictionary里面key为UIImageViewImageLoad的操作，那么为什么要取消呢？来看一个简单的例子：</p>
 <figure class="highlight objectivec"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">UIImageView</span> *imageView = [[<span class="built_in">UIImageView</span> alloc] initWithFrame:<span class="built_in">CGRectMake</span>(<span class="number">100</span>, <span class="number">100</span>, <span class="number">50</span>, <span class="number">50</span>)];</div><div class="line">    [imageView sd_setImageWithURL:[<span class="built_in">NSURL</span> URLWithString:<span class="string">@"http://www.example.com/1.png"</span>] placeholderImage:<span class="literal">nil</span>];</div><div class="line">    [imageView sd_setImageWithURL:[<span class="built_in">NSURL</span> URLWithString:<span class="string">@"http://www.example.com/2.png"</span>] placeholderImage:<span class="literal">nil</span>];</div></pre></td></tr></table></figure>
-<p>可能当第二张图片加载完了第一张图片才加载好，那么这个时候显示的就是第一张图片，这和代码中用第二张图片覆盖第一张图片的操作相违背。当然，这只是一个简单的例子，类似的情况也可能出现在UITableViewCell的重用和缓冲池中，也就是说，不管这个加载是当cell处于缓冲池还是当一个imageview先后加载两张图片，都需要取消对前一张图片的加载。大家想对这种情况有更多了解的话可以去搜文章——《iOS开发——你真的会用SDWebImage？》，我这里就不赘述了。<br>来看下一行代码：</p>
+<p>&emsp;&emsp;可能当第二张图片加载完了第一张图片才加载好，那么这个时候显示的就是第一张图片，这和代码中用第二张图片覆盖第一张图片的操作相违背。当然，这只是一个简单的例子，类似的情况也可能出现在&emsp;&emsp;UITableViewCell的重用和缓冲池中，也就是说，不管这个加载是当cell处于缓冲池还是当一个imageview先后加载两张图片，都需要取消对前一张图片的加载。大家想对这种情况有更多了解的话可以去搜文章——《iOS开发——你真的会用SDWebImage？》，我这里就不赘述了。<br>&emsp;&emsp;来看下一行代码：</p>
 <figure class="highlight objectivec"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">objc_setAssociatedObject(<span class="keyword">self</span>, &amp;imageURLKey, url, OBJC_ASSOCIATION_RETAIN_NONATOMIC);</div></pre></td></tr></table></figure>
-<p>这是一种关联关系，关联self和url，key为imageURLKey。<br>接下去是一个if判断：</p>
+<p>&emsp;&emsp;这是一种关联关系，关联self和url，key为imageURLKey。<br>接下去是一个if判断：</p>
 <figure class="highlight objectivec"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span> (!(options &amp; SDWebImageDelayPlaceholder)) &#123;</div><div class="line">    dispatch_main_async_safe(^&#123;</div><div class="line">        <span class="keyword">self</span>.image = placeholder;</div><div class="line">    &#125;);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>这里出现了一个操作——SDWebImageDelayPlaceholder，你可以去看它的注释，它是一个枚举类型，是将placeholder这个图片延迟加载或者等到image加载好了之后再加载。知道了SDWebImageDelayPlaceholder的意思也就知道这个if语句是在做什么了。如果options中含有SDWebImageDelayPlaceholder，那么image就先不要加载占位图片了，而是要延迟占位图片的加载；相反，则image先显示占位图片。     dispatch_main_async_safe:一个宏，判断当前是否是主线程，是的话执行block的内容。因为图像的绘制只能在主线程完成， 所以，dispatch_main_sync_safe 就是为了保证 block 能在主线程中执行。<br>然后看下面这个大的if语句的内容。</p>
+<p>&emsp;&emsp;这里出现了一个操作——SDWebImageDelayPlaceholder，你可以去看它的注释，它是一个枚举类型，是将placeholder这个图片延迟加载或者等到image加载好了之后再加载。知道了&emsp;&emsp;SDWebImageDelayPlaceholder的意思也就知道这个if语句是在做什么了。如果options中含有SDWebImageDelayPlaceholder，那么image就先不要加载占位图片了，而是要延迟占位图片的加载；相反，则image先显示占位图片。<br>&emsp;&emsp;dispatch_main_async_safe:一个宏，判断当前是否是主线程，是的话执行block的内容。因为图像的绘制只能在主线程完成， 所以，dispatch_main_sync_safe 就是为了保证 block 能在主线程中执行。<br>然后看下面这个大的if语句的内容。</p>
 <figure class="highlight objectivec"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span> ([<span class="keyword">self</span> showActivityIndicatorView]) &#123;</div><div class="line">    [<span class="keyword">self</span> addActivityIndicator];</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>这个判断语句是判断加载的时候是否需要显示菊花，这个addActivityIndicator是和下面的removeActivityIndicator相对应。<br>接下去就是这块内容了：</p>
+<p>&emsp;&emsp;这个判断语句是判断加载的时候是否需要显示菊花，这个addActivityIndicator是和下面的removeActivityIndicator相对应。<br>接下去就是这块内容了：</p>
 <figure class="highlight objectivec"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">id</span> &lt;SDWebImageOperation&gt; operation = [SDWebImageManager.sharedManager downloadImageWithURL:url options:options progress:progressBlock completed:^(<span class="built_in">UIImage</span> *image, <span class="built_in">NSError</span> *error, SDImageCacheType cacheType, <span class="built_in">BOOL</span> finished, <span class="built_in">NSURL</span> *imageURL) &#123;</div></pre></td></tr></table></figure>
-<p>让我们一个一个看这些参数。</p>
+<p>&emsp;&emsp;让我们一个一个看这些参数。</p>
 <ol>
 <li>首先是SDImageCacheType，SDImageCacheType分为三种，SDImageCacheTypeNone（没有缓存，要从网络下载），SDImageCacheTypeDisk（硬盘缓存），SDImageCacheTypeMemory（内存缓存）。</li>
 <li>progress是进度，用来设置图片是随着下载进度一点点显示还是加载完成后一下子显示出来。<br>然后让我们来看看下面的内容：</li>
 </ol>
 <figure class="highlight objectivec"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span> (image &amp;&amp; (options &amp; SDWebImageAvoidAutoSetImage) &amp;&amp; completedBlock)</div><div class="line">&#123;</div><div class="line">    completedBlock(image, error, cacheType, url);</div><div class="line">    <span class="keyword">return</span>;</div><div class="line">&#125;</div><div class="line"><span class="keyword">else</span> <span class="keyword">if</span> (image) &#123;</div><div class="line">    wself.image = image;</div><div class="line">    [wself setNeedsLayout];</div><div class="line">&#125; <span class="keyword">else</span> &#123;</div><div class="line">    <span class="keyword">if</span> ((options &amp; SDWebImageDelayPlaceholder)) &#123;</div><div class="line">        wself.image = placeholder;</div><div class="line">        [wself setNeedsLayout];</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>这里又出现一个operation，SDWebImageAvoidAutoSetImage:这个operation的枚举意思是，有些人想在获取到图片后，对图片做一些处理，比如使用filter去渲染图片或者给图片加个cross-fade animation(淡出动画)显示出来。那你就设置这个选项。然后得手动去处理图片下载完成后的事情。这个手动处理就是compeletedBlock。<br>这个明白了之后判断条件也就基本明白了，那么下面elseIf的内容也就顺理成章了，最下面的else if ((options &amp; SDWebImageDelayPlaceholder)) 是说当image没有获取成功的话则还是显示占位图片，也比较好理解。</p>
+<p>&emsp;&emsp;这里又出现一个operation，SDWebImageAvoidAutoSetImage:这个operation的枚举意思是，有些人想在获取到图片后，对图片做一些处理，比如使用filter去渲染图片或者给图片加个cross-fade animation(淡出动画)显示出来。那你就设置这个选项。然后得手动去处理图片下载完成后的事情。这个手动处理就是compeletedBlock。<br>&emsp;&emsp;这个明白了之后判断条件也就基本明白了，那么下面elseIf的内容也就顺理成章了，最下面的else if ((options &amp; SDWebImageDelayPlaceholder)) 是说当image没有获取成功的话则还是显示占位图片，也比较好理解。</p>
 <figure class="highlight objectivec"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span> (completedBlock &amp;&amp; finished) &#123;</div><div class="line">    completedBlock(image, error, cacheType, url);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>最后的if语句是指，只要你写了completedBlock，不管你有没有设置operation，都会以你的手动处理为优先。</p>
+<p>&emsp;&emsp;最后的if语句是指，只要你写了completedBlock，不管你有没有设置operation，都会以你的手动处理为优先。</p>
 <figure class="highlight objectivec"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">dispatch_main_async_safe(^&#123;</div><div class="line">    [<span class="keyword">self</span> removeActivityIndicator];</div><div class="line">    <span class="keyword">if</span> (completedBlock) &#123;</div><div class="line">        <span class="built_in">NSError</span> *error = [<span class="built_in">NSError</span> errorWithDomain:SDWebImageErrorDomain code:<span class="number">-1</span> userInfo:@&#123;<span class="built_in">NSLocalizedDescriptionKey</span> : <span class="string">@"Trying to load a nil url"</span>&#125;];</div><div class="line">        completedBlock(<span class="literal">nil</span>, error, SDImageCacheTypeNone, url);</div><div class="line">    &#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
-<p>这个是url不存在时的处理，自定义一个nserror，再传给completedBlock。</p>
+<p>&emsp;&emsp;这个是url不存在时的处理，自定义一个nserror，再传给completedBlock。</p>
 
       
     </div>
     <div class="article-info article-info-index">
       
-      <a href="/2016/12/16/SDWebImageRead/" class="archive-article-date">
+      <a href="/2016/12/16/SDWebImageRead1/" class="archive-article-date">
   	<time datetime="2016-12-16T05:03:10.000Z" itemprop="datePublished"><i class="icon-clock"></i>2016-12-16</time>
 </a>
       
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags"></i>
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/SDWbeImage/">SDWbeImage</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/iOS/">iOS</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/源码/">源码</a></li></ul>
+	</div>
+
       
 
       <div class="clearfix"></div>
@@ -300,7 +305,7 @@
     
     	<section class="tools-section tools-section-tag">
     			<div class="widget tagcloud" id="js-tagcloud">
-    				<a href="/tags/iOS/" style="font-size: 10px;">iOS</a> <a href="/tags/导航栏/" style="font-size: 10px;">导航栏</a> <a href="/tags/轮播图片/" style="font-size: 10px;">轮播图片</a>
+    				<a href="/tags/SDWbeImage/" style="font-size: 10px;">SDWbeImage</a> <a href="/tags/iOS/" style="font-size: 20px;">iOS</a> <a href="/tags/导航栏/" style="font-size: 10px;">导航栏</a> <a href="/tags/源码/" style="font-size: 10px;">源码</a> <a href="/tags/轮播图片/" style="font-size: 10px;">轮播图片</a>
     			</div>
     	</section>
     
