@@ -6,17 +6,18 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://lunanar.github.io">
-  <title>Lunar的iOS之路</title>
+  <title>SDWebImage源码阅读（一） | Lunar的iOS之路</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="立志成为一只独当一面的程序媛">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Lunar的iOS之路">
-<meta property="og:url" content="http://lunanar.github.io/index.html">
+  <meta name="description" content="&amp;emsp;&amp;emsp;本文开始将对SDWbeImage这个开源库进行源码阅读，边读会边记录，若有不当之处欢迎大家来信与我讨论(邮箱：&amp;#x6c;&amp;#117;&amp;#110;&amp;#x61;&amp;#114;&amp;#109;&amp;#x61;&amp;#x6f;&amp;#64;&amp;#49;&amp;#x36;&amp;#x33;&amp;#x2e;&amp;#99;&amp;#x6f;&amp;#x6d;)。&amp;emsp;&amp;emsp;我们在使用SDWebImage时用的最多的是这样：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SDWebImage源码阅读（一）">
+<meta property="og:url" content="http://lunanar.github.io/2016/12/16/SDWebImageRead/index.html">
 <meta property="og:site_name" content="Lunar的iOS之路">
-<meta property="og:description" content="立志成为一只独当一面的程序媛">
+<meta property="og:description" content="&amp;emsp;&amp;emsp;本文开始将对SDWbeImage这个开源库进行源码阅读，边读会边记录，若有不当之处欢迎大家来信与我讨论(邮箱：&amp;#x6c;&amp;#117;&amp;#110;&amp;#x61;&amp;#114;&amp;#109;&amp;#x61;&amp;#x6f;&amp;#64;&amp;#49;&amp;#x36;&amp;#x33;&amp;#x2e;&amp;#99;&amp;#x6f;&amp;#x6d;)。&amp;emsp;&amp;emsp;我们在使用SDWebImage时用的最多的是这样：">
+<meta property="og:updated_time" content="2016-12-19T03:10:57.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Lunar的iOS之路">
-<meta name="twitter:description" content="立志成为一只独当一面的程序媛">
+<meta name="twitter:title" content="SDWebImage源码阅读（一）">
+<meta name="twitter:description" content="&amp;emsp;&amp;emsp;本文开始将对SDWbeImage这个开源库进行源码阅读，边读会边记录，若有不当之处欢迎大家来信与我讨论(邮箱：&amp;#x6c;&amp;#117;&amp;#110;&amp;#x61;&amp;#114;&amp;#109;&amp;#x61;&amp;#x6f;&amp;#64;&amp;#49;&amp;#x36;&amp;#x33;&amp;#x2e;&amp;#99;&amp;#x6f;&amp;#x6d;)。&amp;emsp;&amp;emsp;我们在使用SDWebImage时用的最多的是这样：">
   
     <link rel="alternative" href="/atom.xml" title="Lunar的iOS之路" type="application/atom+xml">
   
@@ -140,9 +141,7 @@
 </nav>
 
       <div class="body-wrap">
-        
-  
-    <article id="post-SDWebImageRead" class="article article-type-post" itemscope itemprop="blogPost">
+        <article id="post-SDWebImageRead" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <input type="hidden" class="isFancy" />
@@ -151,8 +150,8 @@
       <header class="article-header">
         
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/12/16/SDWebImageRead/">SDWebImage源码阅读（一）</a>
+    <h1 class="article-title" itemprop="name">
+      SDWebImage源码阅读（一）
     </h1>
   
 
@@ -203,75 +202,37 @@
   </div>
 </article>
 
-
-
-
-
-
-
-
-
-
   
-    <article id="post-仿知乎日报和简书App首页导航栏隐藏出现效果" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
-        
+<nav id="article-nav">
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/12/08/仿知乎日报和简书App首页导航栏隐藏出现效果/">仿知乎日报和简书App首页导航栏隐藏出现效果</a>
-    </h1>
   
+    <a href="/2016/12/08/仿知乎日报和简书App首页导航栏隐藏出现效果/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">仿知乎日报和简书App首页导航栏隐藏出现效果</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
 
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h2><p>&emsp;&emsp;现在的App首页负载越来越重，内容过多，导航栏加tabbar再加满屏的内容似乎都还是不够放，所以显得很多App的首页臃肿凌乱，所以有识之士决定再充分利用导航栏的位置，像知乎、简书App对于导航栏位置的处理现在已是越来越常见，tableview滑到顶部是一个轮播图片，当往下滑动，轮播图片渐渐消失，导航栏逐渐出现；反之，往上滑动，导航栏消失轮播图片出现。所以本文是对这种效果的开发。<br>&emsp;&emsp;先来看一下最终的效果：</p>
-<div align="center">  <img src="/imgs/nav.gif" width="300" alt="最终效果图"></div>
 
-<h3 id="Inital-Contruct"><a href="#Inital-Contruct" class="headerlink" title="Inital Contruct"></a>Inital Contruct</h3><p>&emsp;&emsp;看到这种效果首先想到的是轮播图片的bottom和tableview的top相接。也就是说最初的架构是这样的：<br><img src="/imgs/initalJiagou.png" alt="Smaller icon"></p>
-<p>&emsp;&emsp;但问题是当tableview开始上滑滚动的时候，要设置轮播图片的位置，这个时候就会出现轮播图片还没有滚完但是tableview已经滚了一部分了，也就是这样：</p>
-<div align="center">  <img src="/imgs/problem1.jpeg" width="300" alt="最终效果图"> </div>
 
-<p>&emsp;&emsp;这个问题不知道应该怎样妥善地解决，所以就换了种方法，当然，如果有大神用这种方法也得到了预期的效果，欢迎来信和我讨论。（邮箱：<a href="&#x6d;&#97;&#x69;&#x6c;&#116;&#x6f;&#58;&#x6c;&#117;&#110;&#x61;&#x72;&#109;&#97;&#x6f;&#x40;&#x31;&#x36;&#x33;&#x2e;&#99;&#111;&#109;">&#x6c;&#117;&#110;&#x61;&#x72;&#109;&#97;&#x6f;&#x40;&#x31;&#x36;&#x33;&#x2e;&#99;&#111;&#109;</a>）</p>
-<h3 id="Later-Contruct"><a href="#Later-Contruct" class="headerlink" title="Later Contruct"></a>Later Contruct</h3><p>&emsp;&emsp;这个问题出现的根本是tableview上滑的时候无法带着轮播图片一起，而且tableview的origin frame在改变，所以想到将tableview的origin固定，也就是说tableview占据屏幕，那么轮播图片那块怎么办呢？我们想到用一块header填充，这样的话，架构如下：<br><img src="/imgs/laterJiagou.png" alt="Smaller icon"></p>
-<p>&emsp;&emsp;我们看到，tableview是放在轮播图片的下一层，然后tableview里面含有一层header，这个header最终会被轮播图片遮挡，它的存在只是为了使tableview可以和轮播图片一起往上滚动相同的距离而不会出现第一种方法的问题。</p>
-<h3 id="Coding"><a href="#Coding" class="headerlink" title="Coding"></a>Coding</h3><p>&emsp;&emsp;接下去让我们来看怎么让上滑的时候轮播图片消失导航栏出现而下滑反之。让我们来看一下代码。<br><img src="/imgs/code1.png" alt="Smaller icon"></p>
-<p>&emsp;&emsp;这里用到的主要是scrollview的contentoffset，如果大家对contentoffset、contentsize还有不清楚的话最好先去弄清楚再来看这段代码，这里的scrollview很明显就是tableview的，当offsetY大于0的话，也就是说我们在往上滚动，这个时候应该让轮播图片和tableview一起滚，并且导航栏渐渐出现。</p>
-<h4 id="Part-1"><a href="#Part-1" class="headerlink" title="Part 1"></a>Part 1</h4><p>&emsp;&emsp;首先来看这一小段：<br><img src="/imgs/code2.png" alt="Smaller icon"></p>
-<p>&emsp;&emsp;我们事先把轮播图片距self.view顶部的距离拉了条约束，这个时候只要将这个约束设为-offsetY即可让轮播图片往上滚出tableview一样的距离；导航栏的出现也比较简单，也就是这里的topview，当然，你也可以自己封装一个导航栏，这个不是重点我也只是怎么简单怎么来，导航栏的渐变也就是充分利用好alpha这个参数，这里轮播图片的高度为lunboViewCustomHeight（220），当轮播图片往上滚出（lunboViewCustomHeight－64（导航栏的高度））的高度的时候，导航栏要透明度为1，所以透明度的渐变就是随着offsetY而线性变化：CGFloat alpha = offsetY / (lunboViewCustomHeight-64);</p>
-<h4 id="Part-2"><a href="#Part-2" class="headerlink" title="Part 2"></a>Part 2</h4><p><img src="/imgs/code3.png" alt="Smaller icon"></p>
-<p>&emsp;&emsp;再讲一下往下滑动的情况，当下滑时offsetY还是大于0的时候，那还是按照上面一段代码走，当offsetY小于0，这个时候轮播图片是全部展示在页面上的，也就是最初始的页面，这个时候还往下滑，其实是一个刷新的动作，当然，这里没有做刷新，但是做了刷新时的一个效果(如下图)，也就是感觉图片随着你的拉伸在放大，这个也是轮播图片的随着offsetY变化的一个线性变化，也就是改变它的高度；至于为什么要做一个小于60的判断呢，就是一种拉伸到底的感觉，你问为啥是60？瞎写的。。你也可以写80啥的。</p>
-<div align="center">  <img src="/imgs/shuaxin.jpeg" width="300" alt="最终效果图"> </div>
 
-<h4 id="Part-3"><a href="#Part-3" class="headerlink" title="Part 3"></a>Part 3</h4><p><img src="/imgs/code5.png" alt="Smaller icon"></p>
-<p>&emsp;&emsp;最后的最后，有一个offsetY为0的设置，这个是我发现有时候比较快地滚动到初始位置时，轮播图片和tableview之间会有空隙，我猜测是滚动太快，offsetY并不是为0，有一定的偏移量，所以这里硬性进行了一个设置，当然大家若有其他好的解决方法也欢迎提出。<br>&emsp;&emsp;以上差不多是这个demo最难的部分了，其他的话像轮播图片应该各个地方都有很多方法，我是用了BHInfiniteScrollView，大家也可以用别的，这个关系不大，原理都是一样的。</p>
-<h3 id="Final"><a href="#Final" class="headerlink" title="Final"></a>Final</h3><p>&emsp;&emsp;最后附上github地址：<br>&emsp;&emsp;<a href="https://github.com/lunanar/HideAndShowNavigation.git" target="_blank" rel="external">https://github.com/lunanar/HideAndShowNavigation.git</a></p>
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      <a href="/2016/12/08/仿知乎日报和简书App首页导航栏隐藏出现效果/" class="archive-article-date">
-  	<time datetime="2016-12-08T05:38:39.000Z" itemprop="datePublished"><i class="icon-clock"></i>2016-12-08</time>
-</a>
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags"></i>
-		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/iOS/">iOS</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/导航栏/">导航栏</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/轮播图片/">轮播图片</a></li></ul>
+<div class="share_jia">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">Share to: &nbsp; </span>
+		<a class="jiathis_button_facebook"></a> 
+	    <a class="jiathis_button_twitter"></a>
+	    <a class="jiathis_button_plus"></a> 
+	    <a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+    <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
 	</div>
-
-      
-
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
+	<script type="text/javascript" src="//v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
 
 
 
@@ -279,64 +240,6 @@
 
 
 
-
-
-
-  
-    <article id="post-hello-world" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/11/09/hello-world/">Hello World</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo server</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo generate</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo deploy</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      <a href="/2016/11/09/hello-world/" class="archive-article-date">
-  	<time datetime="2016-11-09T06:58:09.000Z" itemprop="datePublished"><i class="icon-clock"></i>2016-11-09</time>
-</a>
-      
-      
-
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-
-
-
-
-
-
-
-
-
-  
-  
 
 
       </div>
@@ -358,8 +261,8 @@
 		fancybox: true,
 		mathjax: false,
 		animate: true,
-		isHome: true,
-		isPost: false,
+		isHome: false,
+		isPost: true,
 		isArchive: false,
 		isTag: false,
 		isCategory: false,
